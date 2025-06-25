@@ -9,6 +9,13 @@ export interface Job {
   description: string;
 }
 
+// Extract Tag as a reusable component for scalability
+const Tag: React.FC<{ label: string }> = React.memo(({ label }) => (
+  <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+    {label}
+  </span>
+));
+
 const JobCard: React.FC<{ job: Job }> = React.memo(({ job }) => (
   <article className="bg-white p-5 rounded-xl shadow border border-gray-100">
     <div className="flex justify-between items-start">
@@ -27,9 +34,7 @@ const JobCard: React.FC<{ job: Job }> = React.memo(({ job }) => (
     <ul className="flex flex-wrap gap-2 mt-3">
       {job.tags.map((tag) => (
         <li key={tag}>
-          <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
-            {tag}
-          </span>
+          <Tag label={tag} />
         </li>
       ))}
     </ul>
