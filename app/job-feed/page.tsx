@@ -1,55 +1,42 @@
-"use client";
-import { useState } from "react";
-import { jobData } from "@/app/lib/jobData";
+'use client'
 
-export default function JobFeed() {
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+import { useState } from 'react'
+import { sampleJobs } from '@/data/sample-jobs'
+import JobCard, { Job } from '@/components/JobCard'
 
-  const filteredJobs = activeTag
-    ? jobData.filter((job) => job.tags.includes(activeTag))
-    : jobData;
+export default function JobFeedPage() {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filteredJobs = sampleJobs.filter((job: Job) => {
+    const matchesSearch =
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.skills.some(skill =>
+        skill.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+
+    return matchesSearch
+  })
 
   return (
-    <div className="space-y-6 p-4">
-      {activeTag && (
-        <div className="flex items-center gap-4 mb-2">
-          <span className="text-sm font-medium">
-            Showing results for tag: <strong>{activeTag}</strong>
-          </span>
-          <button
-            className="text-blue-600 text-sm underline"
-            onClick={() => setActiveTag(null)}
-          >
-            Clear Filter
-          </button>
-        </div>
-      )}
+    <div className="p-6 space-y-6">
+      {/* Search Input */}
+      <input
+        type="text"
+        placeholder="Search jobs..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+      />
 
-      {filteredJobs.map((job) => (
-        <div
-          key={job.id}
-          className="rounded-2xl border shadow-sm p-4 hover:shadow-md transition"
-        >
-          <h2 className="text-lg font-semibold">{job.title}</h2>
-          <p className="text-sm text-muted-foreground mb-1">
-            {job.posted} • {job.budget}
-          </p>
-          <p className="text-sm mb-2">{job.description}</p>
-
-          {/* 🔽 THIS is where the clickable, spaced tags happen */}
-          <div className="flex flex-wrap gap-2 mt-2">
-            {job.tags.map((tag, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveTag(tag)}
-                className="bg-gray-800 text-white px-3 py-1 rounded-full text-xs hover:bg-gray-700 transition"
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
+      {/* Job Feed */}
+      <div className="space-y-4">
+        {filteredJobs.length > 0 ? (
+          filteredJobs.map(job => <JobCard key={job.id} job={job} />)
+        ) : (
+          <div className="text-gray-500 text-sm pt-10">No jobs found.</div>
+        )}
+      </div>
     </div>
-  );
+  )
 }
